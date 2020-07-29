@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { JoinTable, ManyToMany, OneToMany } from 'typeorm/index';
+import { BeforeInsert, JoinTable, ManyToMany, OneToMany } from 'typeorm/index';
+import * as bcrypt from 'bcryptjs';
 
 import { Dialog } from '../dialog/dialog.entity';
 import { Message } from '../message/message.entity';
@@ -7,12 +8,12 @@ import { Message } from '../message/message.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
-  @Column({ nullable: false })
+  @Column({ name: 'first_name', nullable: false })
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'last_name', nullable: true })
   lastName: string;
 
   @Column({ nullable: true })
@@ -34,4 +35,9 @@ export class User {
 
   @OneToMany(() => Message, message => message.owner)
   messages: Message[];
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
 }

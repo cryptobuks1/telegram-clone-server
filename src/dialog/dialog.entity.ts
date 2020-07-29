@@ -9,7 +9,7 @@ export class Dialog {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   name: string;
 
   @ManyToMany(() => User, user => user.dialogs)
