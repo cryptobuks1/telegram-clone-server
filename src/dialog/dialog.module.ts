@@ -1,11 +1,18 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { DialogService } from './dialog.service';
 import { DialogController } from './dialog.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Dialog } from './dialog.entity';
+import { UserModule } from '../user/user.module';
+import { User } from '../user/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Dialog])],
+  imports: [
+    UserModule,
+
+    TypeOrmModule.forFeature([Dialog, User])
+  ],
   providers: [DialogService],
   controllers: [DialogController],
 })
