@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BeforeInsert, JoinTable, ManyToMany, OneToMany } from 'typeorm/index';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 import { Dialog } from '../dialog/dialog.entity';
 import { Message } from '../message/message.entity';
@@ -19,21 +19,32 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ nullable: false })
+  @Column({ unique: true, nullable: false })
   phone: string;
 
   @Column({ nullable: false })
   password: string;
 
+  @ManyToMany(() => User, user => user.contact)
+  contact: User[];
+
+  @ManyToMany(() => User, user => user.contacts)
+  @JoinTable({
+    name: 'users_contacts',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'contact_id', referencedColumnName: 'id' },
+  })
+  contacts: User[];
+
+  @ManyToMany(() => Dialog, dialog => dialog.users)
   @JoinTable({
     name: 'users_dialogs',
     joinColumn: { name: 'user_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'dialog_id', referencedColumnName: 'id' },
   })
-  @ManyToMany(() => User, user => user.dialogs)
   dialogs: Dialog[];
 
-  @OneToMany(() => Message, message => message.owner)
+  @OneToMany(() => Message, message => message.owner, { cascade: true })
   messages: Message[];
 
   @BeforeInsert()

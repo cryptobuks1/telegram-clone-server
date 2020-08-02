@@ -4,4 +4,6 @@ export interface JwtPayload {
   readonly last_name?: string,
   readonly avatar?: string,
   readonly phone: string,
+  readonly iat: number,
+  readonly exp: number
 }

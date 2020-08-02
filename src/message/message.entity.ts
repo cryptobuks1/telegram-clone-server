@@ -1,13 +1,5 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
-import {
-  Column,
-  CreateDateColumn,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  UpdateDateColumn,
-} from 'typeorm/index';
+import { Column, CreateDateColumn, JoinColumn, ManyToMany, ManyToOne, UpdateDateColumn } from 'typeorm/index';
 
 import { Dialog } from '../dialog/dialog.entity';
 import { User } from '../user/user.entity';
@@ -15,10 +7,10 @@ import { User } from '../user/user.entity';
 @Entity('messages')
 export class Message {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ type: 'text', nullable: false })
-  content: string;
+  text: string;
 
   @CreateDateColumn({ name: 'created_date' })
   createdDate: Date;
@@ -30,11 +22,6 @@ export class Message {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   owner: User;
 
-  @JoinTable({
-    name: 'messages_dialogs',
-    joinColumn: { name: 'message_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'dialog_id', referencedColumnName: 'id' },
-  })
-  @ManyToMany(() => Dialog, dialog => dialog.messages)
+  @ManyToMany(() => Dialog, dialog => dialog.messages, { cascade: true })
   dialogs: Dialog[];
 }
