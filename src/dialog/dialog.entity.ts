@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { JoinTable, ManyToMany } from 'typeorm/index';
+import { Column, JoinTable, ManyToMany } from 'typeorm/index';
 
 import { User } from '../user/user.entity';
 import { Message } from '../message/message.entity';
@@ -9,10 +9,16 @@ export class Dialog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: false })
+  type: string;
+
+  @Column({ nullable: true })
+  name?: string;
+
   @ManyToMany(() => User, user => user.dialogs, { cascade: true })
   users: User[];
 
-  @ManyToMany(() => Message, message => message.dialogs)
+  @ManyToMany(() => Message, message => message.dialogs, { cascade: true })
   @JoinTable({
     name: 'dialogs_messages',
     joinColumn: { name: 'dialog_id', referencedColumnName: 'id' },

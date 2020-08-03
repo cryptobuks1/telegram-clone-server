@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm/index';
 
@@ -25,9 +25,13 @@ export class UserService {
   }
 
   public async findById(id: string): Promise<User> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
     });
+    if (!user) {
+      throw new BadRequestException();
+    }
+    return user;
   }
 
   public async findContactsById(id: string): Promise<ContactDto[]> {
@@ -41,7 +45,7 @@ export class UserService {
 
   public async findDialogsById(id: string): Promise<Dialog[]> {
     const user = await this.userRepository.findOne({
-      relations: ['dialogs', 'dialogs.users', 'dialogs.messages'],
+      relations: ['dialogs', 'dialogs.users', 'dialogs.messages', 'dialogs.messages.owner'],
       where: { id },
     });
     user.dialogs.forEach(dialog => {
