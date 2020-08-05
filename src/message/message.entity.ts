@@ -12,16 +12,22 @@ export class Message {
   @Column({ type: 'text', nullable: false })
   text: string;
 
-  @CreateDateColumn({ name: 'created_date' })
+  @Column({ name: 'is_updated', type: 'boolean', nullable: false, default: false })
+  isUpdated: boolean;
+
+  @Column({ nullable: false, type: 'text', default: 'text' })
+  type: string;
+
+  @CreateDateColumn({ name: 'created_date', nullable: false })
   createdDate: Date;
 
-  @UpdateDateColumn({ name: 'updated_date' })
+  @UpdateDateColumn({ name: 'updated_date', nullable: false })
   updatedDate: Date;
 
   @ManyToOne(() => User, user => user.messages)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   owner: User;
 
-  @ManyToMany(() => Dialog, dialog => dialog.messages, { cascade: true })
+  @ManyToMany(() => Dialog, dialog => dialog.messages)
   dialogs: Dialog[];
 }

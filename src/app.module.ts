@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DialogModule } from './dialog/dialog.module';
 import { MessageModule } from './message/message.module';
+import { AppGateway } from './app.gateway';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -23,6 +24,7 @@ const environment = process.env.NODE_ENV || 'development';
       isGlobal: true,
     }),
   ],
+  providers: [AppGateway],
 })
 export class AppModule {
 }
