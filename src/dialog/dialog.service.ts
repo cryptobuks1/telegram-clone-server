@@ -41,7 +41,12 @@ export class DialogService {
   }
 
   public async findAllByUserId(userId: string): Promise<Dialog[]> {
-    return await this.userService.findDialogsById(userId);
+    const dialogs = await this.userService.findDialogsById(userId);
+    return dialogs.sort((a, b) => {
+      if (a.messages.length > 0 && b.messages.length > 1) {
+        return b.messages[0].createdDate.getTime() - a.messages[0].createdDate.getTime();
+      }
+    });
   }
 
   public async getMessages(getMessagesDto: GetMessagesDto): Promise<Message[]> {
