@@ -18,10 +18,14 @@ export class UserService {
   }
 
   public async findByPhone(phone: string): Promise<User> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       relations: ['dialogs'],
       where: { phone },
     });
+    if (!user) {
+      throw new BadRequestException(`User with phone ${phone} does not exist`);
+    }
+    return user;
   }
 
   public async findById(id: string): Promise<User> {
@@ -29,7 +33,7 @@ export class UserService {
       where: { id },
     });
     if (!user) {
-      throw new BadRequestException();
+      throw new BadRequestException(`User with id ${id} does not exist`);
     }
     return user;
   }
@@ -39,8 +43,7 @@ export class UserService {
       relations: ['contacts'],
       where: { id },
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return user.contacts.map(({ password, ...contacts }) => contacts);
+    return user.contacts;
   }
 
   public async findDialogsById(id: string): Promise<Dialog[]> {

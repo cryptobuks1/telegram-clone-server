@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
 
 import { UserService } from '../user/user.service';
 import { UserDto } from '../user/dto/user.dto';
 import { JwtToken } from './interfaces/jwt-token.interface';
 import { ValidateCredentials } from './interfaces/validate-credentials.interface';
+import { LoginDto } from './dto/login.dto';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,19 +17,23 @@ export class AuthService {
   }
 
   async validateUser(credentials: ValidateCredentials): Promise<UserDto> {
-    const user = await this.userService.findByPhone(credentials.phone);
-    if (user) {
-      if (credentials.password && !await bcrypt.compare(credentials.password, user.password)) {
-        return null;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...validatedUser } = user;
-      return validatedUser;
-    }
-    return null;
+    return await this.userService.findByPhone(credentials.phone);
   }
 
-  async generateJwtToken(user: UserDto): Promise<JwtToken> {
+  async login(loginDto: LoginDto): Promise<JwtToken> {
+    const user = await this.userService.findByPhone(loginDto.phone);
+    return this.generateJwtToken(user);
+  }
+
+  async register(registerDto: LoginDto): Promise<JwtToken> {
+    const user = new User();
+    user.firstName = 'u' + (1000000 + Math.random() * (9999999 + 1 - 1000000));
+    user.username = 'u' + (1000000 + Math.random() * (9999999 + 1 - 1000000));
+    user.phone = registerDto.phone;
+    return this.generateJwtToken(await this.userService.create(user));
+  }
+
+  private generateJwtToken(user: UserDto): JwtToken {
     const payload = {
       sub: user.id,
       first_name: user.firstName,
